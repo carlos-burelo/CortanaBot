@@ -79,30 +79,37 @@ def repo(bot: Bot, update: Update):
     message = update.effective_message
     text = message.text[len('/git '):]
     usr = get(f'https://api.github.com/repos/{text}')
+    print("###################################################################")
+    print(usr)
 
     if text == '':
-        reply_text = "Please type your **username** into it!"
+        reply_text = "Please type your **username** into it!\nFor example, `/git carlos-burelo`"
         message.reply_text(reply_text, parse_mode=ParseMode.MARKDOWN, disable_web_page_preview=True)
         return
 
     if usr.status_code == 200:
         reply_text = f"""**Name:** `{usr['name']}`
-        **Fullname:** `{usr['full_name']}`
-        **Description:** `{usr['description']}`
-        **Forks:** `{usr['fork']}`
-        **link:** `{usr['html_url']}`
-        **Branch:** `{usr['default_branch']}`
-        **Last Update:** `{usr['updated_at']}`
+        **Username:** `{usr['login']}`
+        **Account ID:** `{usr['id']}`
+        **Account type:** `{usr['type']}`
+        **Location:** `{usr['location']}`
+        **Bio:** `{usr['bio']}`
+        **Followers:** `{usr['followers']}`
+        **Following:** `{usr['following']}`
+        **Hireable:** `{usr['hireable']}`
+        **Public Repos:** `{usr['public_repos']}`
+        **Public Gists:** `{usr['public_gists']}`
+        **Email:** `{usr['email']}`
+        **Company:** `{usr['company']}`
+        **Website:** `{usr['blog']}`
+        **Last updated:** `{usr['updated_at']}`
+        **Account created at:** `{usr['created_at']}`
         """
         return
 
     elif usr.status_code == 404:
-        reply_text = "User or Repo not found."
+        reply_text = "Device not found."
     message.reply_text(reply_text, parse_mode=ParseMode.MARKDOWN, disable_web_page_preview=True)
-
-
-
-
 
 @run_async
 def havoc(bot: Bot, update: Update):
