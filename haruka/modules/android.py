@@ -58,7 +58,7 @@ def git(bot: Bot, update: Update):
 
 #GITHUB MODULES
 @run_async
-def repo(bot: Bot, update: Update):
+def repos(bot: Bot, update: Update):
     message = update.effective_message
     text = message.text[len('/git '):]
     usr = get(f'https://api.github.com/users/{text}/repos?per_page=300')
@@ -73,6 +73,48 @@ def repo(bot: Bot, update: Update):
     for i in range(len(usr)):
         reply_text += f"[{usr[i]['name']}]({usr[i]['html_url']})\n"
         return
+
+@run_async
+def repo(bot: Bot, update: Update, args: List[str]):
+    # URL_API = "https://api.github.com/repos/"
+    message = update.effective_message
+
+    if len(args) != 2:
+        reply_text = "Please type your user **<user>** and **<reponame>** into it!\nFor example, `/repo carlos builds`"
+        message.reply_text(reply_text, parse_mode=ParseMode.MARKDOWN, disable_web_page_preview=True)
+        return
+
+    owner = args[0]
+    reponame = args[1]
+    # text = message.text[len('/git '):]
+    usr = get(f'https://api.github.com/repos/{owner}/{reponame}')
+
+    if owner == '':
+        reply_text = "Please type your **username** into it!"
+        message.reply_text(reply_text, parse_mode=ParseMode.MARKDOWN, disable_web_page_preview=True)
+        return
+    if reponame == '':
+        reply_text = "Please type your **reponame** into it!"
+        message.reply_text(reply_text, parse_mode=ParseMode.MARKDOWN, disable_web_page_preview=True)
+        return
+
+    if usr.status_code == 200:
+        reply_text = f"""**Name:** `{usr['name']}`
+        **Fullname:** `{usr['full_name']}`
+        **Description:** `{usr['description']}`
+        **Forks:** `{usr['fork']}`
+        **link:** `{usr['html_url']}`
+        **Branch:** `{usr['default_branch']}`
+        **Last Update:** `{usr['updated_at']}`
+        """
+        return
+
+    elif usr.status_code == 404:
+        reply_text = "User or Repo not found."
+    message.reply_text(reply_text, parse_mode=ParseMode.MARKDOWN, disable_web_page_preview=True)
+
+
+
 
 
 @run_async
@@ -499,6 +541,9 @@ def getaex(bot: Bot, update: Update, args: List[str]):
         message.reply_text("No builds found for the provided device-version combo.")
 
 
+
+
+
 @run_async
 def bootleggers(bot: Bot, update: Update):
     message = update.effective_message
@@ -556,13 +601,15 @@ def bootleggers(bot: Bot, update: Update):
 __help__ = """
  *Github*
  - /git <username>
- - /repo <username>
+ - /repo <username> <reponame>
+ - /repos <username>
 
 """
 
 __mod_name__ = "GitHub"
 
 GIT_HANDLER = DisableAbleCommandHandler("git", git, admin_ok=True)
+REPOS_HANDLER = DisableAbleCommandHandler("repos", repos, admin_ok=True)
 REPO_HANDLER = DisableAbleCommandHandler("repo", repo, admin_ok=True)
 GETAEX_HANDLER = DisableAbleCommandHandler("aex", getaex, pass_args=True, admin_ok=True)
 MIUI_HANDLER = DisableAbleCommandHandler("miui", miui, admin_ok=True)
@@ -580,6 +627,7 @@ LOS_HANDLER = DisableAbleCommandHandler("los", los, admin_ok=True)
 BOOTLEGGERS_HANDLER = DisableAbleCommandHandler("bootleggers", bootleggers, admin_ok=True)
 
 dispatcher.add_handler(GIT_HANDLER)
+dispatcher.add_handler(REPOS_HANDLER)
 dispatcher.add_handler(REPO_HANDLER)
 dispatcher.add_handler(GETAEX_HANDLER)
 dispatcher.add_handler(MIUI_HANDLER)
