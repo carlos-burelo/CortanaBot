@@ -75,26 +75,13 @@ def repos(bot: Bot, update: Update):
         return
 
 @run_async
-def repo(bot: Bot, update: Update, args: List[str]):
-    # URL_API = "https://api.github.com/repos/"
+def repo(bot: Bot, update: Update):
     message = update.effective_message
+    text = message.text[len('/git '):]
+    usr = get(f'https://api.github.com/repos/{text}')
 
-    if len(args) != 2:
-        reply_text = "Please type your user **<user>** and **<reponame>** into it!\nFor example, `/repo carlos builds`"
-        message.reply_text(reply_text, parse_mode=ParseMode.MARKDOWN, disable_web_page_preview=True)
-        return
-
-    owner = args[0]
-    reponame = args[1]
-    # text = message.text[len('/git '):]
-    usr = get(f'https://api.github.com/repos/{owner}/{reponame}')
-
-    if owner == '':
+    if text == '':
         reply_text = "Please type your **username** into it!"
-        message.reply_text(reply_text, parse_mode=ParseMode.MARKDOWN, disable_web_page_preview=True)
-        return
-    if reponame == '':
-        reply_text = "Please type your **reponame** into it!"
         message.reply_text(reply_text, parse_mode=ParseMode.MARKDOWN, disable_web_page_preview=True)
         return
 
@@ -601,7 +588,7 @@ def bootleggers(bot: Bot, update: Update):
 __help__ = """
  *Github*
  - /git <username>
- - /repo <username> <reponame>
+ - /repo <username>/<reponame>
  - /repos <username>
 
 """
